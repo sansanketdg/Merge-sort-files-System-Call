@@ -1,0 +1,74 @@
+CSE-506 FALL-16 HW1
+Author: Sanket Dige
+SBUID: 110815356
+
+This projects aims at injecting a new system call to merge-sort 2 input files which already has its respective string members sorted in a given output files.
+
+It contains a minimal linux kernel configuration namely “kernel.config” that has a minimal config lines #991.
+
+Steps I did to inject a new system call in the linux kernel -
+
+1. Ran a patch “cse506-syscall.patch” which aims at injecting a dummy sys call along with creation of the folder named “hw1” that has the system call definition and user-program that consumes the call.
+
+2. Rebuilt the kernel and rebooted.
+
+
+Implementation description - 
+
+* sys_xmergesort.h
+
+This header file contains the definition struct that has all the member variables which are passed to systemically from user-program. It also has all the flags and their definition values.
+
+* xmergesort.c
+
+This file contains the kernel space implementation of the system call where not only the options being passed are re-evaluated but various error handling is performed while executing the merge process of files. The program is primarily aimed at handling "n" number of input files which are then merged and outputted in a sorted manner in the desired output file. The desired implementation is achieved while maintaining a "constant" buffer space regardless of the number of input files i.e. aimed at memory efficiency.
+
+*xhw1.c
+
+This file has the user program that will consume the systemcall for its working.
+
+
+
+How to build - 
+1. Make
+2. sh install_module.sh
+
+How to use - 
+
+./xmergesort [-uaitd] outfile.txt input1.txt input2.txt
+
+Note : this merge sort only support merging of 2 files at a time.
+
+The different flags are defined as follows-
+
+-u 0x01: output sorted records; if duplicates found, output only one copy
+-a 0x02: output all records, even if there are duplicates
+-i 0x04: compare records case-insensitive (case sensitive by default)
+-t 0x10: if any input file is found NOT to be sorted, stop and return an
+	 error (EINVAL); otherwise continue to output records ONLY if any
+	 are found that are in ascending order to what you've found so far.
+-d 0x20: return the number of sorted records written out in "data"
+
+It is mandatory that at-least one of the ‘a’ or ‘u’ flags should be set. If both ‘a’/‘u’ flags are not set or both of them are set together, the system call will return an error -EINVAL.
+
+Some of the errors/conditions which are handled and resolved are :
+
+1. null argument(s).
+2. Missing argument(s).
+3. Pointers pointing to bad addresses.
+4. Invalid flags or combination of flags.
+5. Input files doesn’t exist or cannot be opened or read.
+6. Output file cannot be opened or written.
+7. Input/ Output files are not regular.
+8. Input file(s) point to an output file itself.
+9. Out of the given input files, the least protection mode is set for the output file.
+10. For partial failure, partial output files gets deleted returning and appropriate error code.
+
+References - 
+
+1) http://lxr.free-electrons.com/ 
+2) http://man7.org/linux/man-pages/
+3) https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
+4) Discussion with Rashmi Makheja (110920870)
+
+

@@ -1,0 +1,1 @@
+cmd_/usr/src/hw1-sdige/hw1/sys_xmergesort.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /usr/src/hw1-sdige/hw1/sys_xmergesort.ko /usr/src/hw1-sdige/hw1/sys_xmergesort.o /usr/src/hw1-sdige/hw1/sys_xmergesort.mod.o
